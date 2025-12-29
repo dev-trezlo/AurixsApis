@@ -1,0 +1,22 @@
+# Team Aurixs Uncensored AI API 2025
+
+Private self-hosted OpenAI-compatible API – zero limits, pure uncensored.
+
+## Models
+- dolphin-llama3.1:8b (default – fastest + most unhinged)
+- dolphin-mixtral:8x7b (coding beast)
+- wizardlm-uncensored
+
+## Endpoints
+- POST /v1/chat/completions → Bearer Token in Authorization
+- GET /v1/models
+
+## Deploy
+1. Run `./deploy.sh`
+2. `cp .env.example .env` → add your keys
+3. `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+
+## Expose
+Use Cloudflare Tunnel or Ngrok for HTTPS.
+
+No limits. No censorship. Infinite chaos.
