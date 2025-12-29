@@ -1,22 +1,643 @@
-# Team Aurixs Uncensored AI API 2025
+# 🚀 Uncensored AI API Documentation 
+# [Team Aurixs]
 
-Private self-hosted OpenAI-compatible API – zero limits, pure uncensored.
+**OpenAI-Compatible Self-Hosted AI API**
 
-## Models
-- dolphin-llama3.1:8b (default – fastest + most unhinged)
-- dolphin-mixtral:8x7b (coding beast)
-- wizardlm-uncensored
+---
 
-## Endpoints
-- POST /v1/chat/completions → Bearer Token in Authorization
-- GET /v1/models
+## 📋 Table of Contents
 
-## Deploy
-1. Run `./deploy.sh`
-2. `cp .env.example .env` → add your keys
-3. `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+- [Overview](#overview)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [API Endpoints](#api-endpoints)
+- [Authentication](#authentication)
+- [Admin Panel](#admin-panel)
+- [Usage Examples](#usage-examples)
+- [Security](#security)
+- [Troubleshooting](#troubleshooting)
 
-## Expose
-Use Cloudflare Tunnel or Ngrok for HTTPS.
+---
 
-No limits. No censorship. Infinite chaos.
+## 🎯 Overview
+
+OpenAI-compatible AI API powered by Ollama. Designed for developers who need flexible AI integration without third-party restrictions.
+
+**Key Highlights:**
+- OpenAI-compatible endpoints
+- Real-time streaming support
+- Multiple model support
+- Admin dashboard
+- Production-ready architecture
+
+---
+
+## ✨ Features
+
+### Core Functionality
+- ✅ OpenAI-compatible `/v1/chat/completions` endpoint
+- ✅ Real-time streaming responses
+- ✅ Multiple model support (Llama, Dolphin, Mistral, etc.)
+- ✅ Conversation history management
+- ✅ Token usage tracking
+
+### Admin Features
+- 🔧 Live model pulling
+- 🔧 API key generation
+- 🔧 System statistics monitoring
+- 🔧 Log management
+- 🔧 Remote restart capability
+
+### Security & Performance
+- 🛡️ JWT-based authentication
+- 🛡️ API key authorization
+- 🛡️ Rate limiting
+- 🛡️ CORS configuration
+- 🛡️ Request logging
+- 🛡️ IP whitelisting (optional)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- API endpoint URL (provided by admin)
+- Valid API key
+
+### Test Connection
+
+```bash
+curl https://api.yourdomain.com/v1/models \
+  -H "Authorization: Bearer your-api-key"
+```
+
+### Interactive Documentation
+- **Swagger UI:** `https://api.yourdomain.com/docs`
+- **ReDoc:** `https://api.yourdomain.com/redoc`
+
+---
+
+## ⚙️ Configuration
+
+### Base URL
+```
+https://api.yourdomain.com
+```
+
+### Available Models
+- `dolphin3` - General purpose, fast responses
+- `mistral-uncensored` - Balanced performance
+- `llama3-lexi` - Creative writing
+- `nous-hermes2` - Complex reasoning
+
+Check current models:
+```bash
+curl https://api.yourdomain.com/v1/models \
+  -H "Authorization: Bearer your-api-key"
+```
+
+---
+
+## 📡 API Endpoints
+
+### 1. Chat Completions
+
+**Endpoint:** `POST /v1/chat/completions`
+
+**Headers:**
+```
+Authorization: Bearer your-api-key
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "model": "dolphin3",
+  "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Explain quantum computing"}
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "stream": false
+}
+```
+
+**Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| model | string | required | Model name to use |
+| messages | array | required | Chat messages array |
+| temperature | float | 0.7 | Creativity (0.0-2.0) |
+| max_tokens | integer | 2000 | Max response length |
+| stream | boolean | false | Enable streaming |
+| top_p | float | 1.0 | Nucleus sampling |
+| frequency_penalty | float | 0.0 | Reduce repetition |
+| presence_penalty | float | 0.0 | Encourage diversity |
+
+**Response:**
+```json
+{
+  "id": "chatcmpl-abc123",
+  "object": "chat.completion",
+  "created": 1704067200,
+  "model": "dolphin3",
+  "choices": [{
+    "index": 0,
+    "message": {
+      "role": "assistant",
+      "content": "Quantum computing is a revolutionary technology..."
+    },
+    "finish_reason": "stop"
+  }],
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 150,
+    "total_tokens": 170
+  }
+}
+```
+
+**Streaming Response:**
+
+Set `"stream": true` to receive Server-Sent Events:
+
+```json
+data: {"id":"chatcmpl-123","choices":[{"delta":{"content":"Quantum"}}]}
+data: {"id":"chatcmpl-123","choices":[{"delta":{"content":" computing"}}]}
+data: [DONE]
+```
+
+### 2. List Models
+
+**Endpoint:** `GET /v1/models`
+
+**Response:**
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "dolphin3",
+      "object": "model",
+      "created": 1704067200,
+      "owned_by": "ollama"
+    },
+    {
+      "id": "mistral-uncensored",
+      "object": "model",
+      "created": 1704067200,
+      "owned_by": "ollama"
+    }
+  ]
+}
+```
+
+---
+
+## 🔑 Authentication
+
+### API Key Format
+
+All requests require a Bearer token in the Authorization header:
+
+```
+Authorization: Bearer sk-your-api-key
+```
+
+### Key Types
+
+1. **Normal API Keys** → Access to `/v1/*` endpoints
+2. **Admin Keys** → Full access including `/admin/*` endpoints
+
+---
+
+## 👑 Admin Panel
+
+**Note:** Admin endpoints require admin-level API keys.
+
+### 1. System Statistics
+
+**Endpoint:** `GET /admin/stats`
+
+**Response:**
+```json
+{
+  "api_status": "running",
+  "ollama_status": "healthy",
+  "models_loaded": 3,
+  "uptime_seconds": 86400,
+  "total_requests": 1234,
+  "active_keys": 5
+}
+```
+
+### 2. Pull New Model
+
+**Endpoint:** `POST /admin/pull-model`
+
+**Request:**
+```json
+{
+  "model_name": "mistral-uncensored"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Model mistral-uncensored pulled successfully"
+}
+```
+
+### 3. Generate API Key
+
+**Endpoint:** `POST /admin/generate-key`
+
+**Request:**
+```json
+{
+  "key_type": "normal",
+  "description": "Bot production key"
+}
+```
+
+**Response:**
+```json
+{
+  "api_key": "sk-generated-key-abc123",
+  "type": "normal",
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+### 4. View Logs
+
+**Endpoint:** `GET /admin/logs?lines=100`
+
+**Response:**
+```json
+{
+  "logs": [
+    "2025-01-15 10:30:00 - INFO - Request received",
+    "2025-01-15 10:30:01 - INFO - Response sent"
+  ]
+}
+```
+
+### 5. Restart API
+
+**Endpoint:** `POST /admin/restart`
+
+**Response:**
+```json
+{
+  "status": "restarting",
+  "message": "API will restart in 5 seconds"
+}
+```
+
+---
+
+## 💻 Usage Examples
+
+### cURL
+
+**Simple Chat:**
+```bash
+curl https://api.yourdomain.com/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "dolphin3",
+    "messages": [
+      {"role": "user", "content": "Hello! How are you?"}
+    ]
+  }'
+```
+
+**Streaming Chat:**
+```bash
+curl https://api.yourdomain.com/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "dolphin3",
+    "messages": [
+      {"role": "user", "content": "Write a story"}
+    ],
+    "stream": true
+  }'
+```
+
+### Python
+
+**Basic Usage:**
+```python
+import requests
+
+API_URL = "https://api.yourdomain.com/v1/chat/completions"
+API_KEY = "sk-your-api-key"
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "model": "dolphin3",
+    "messages": [
+        {"role": "user", "content": "Explain machine learning"}
+    ],
+    "temperature": 0.7,
+    "max_tokens": 1000
+}
+
+response = requests.post(API_URL, headers=headers, json=data)
+result = response.json()
+
+print(result['choices'][0]['message']['content'])
+```
+
+**Streaming Response:**
+```python
+import requests
+
+API_URL = "https://api.yourdomain.com/v1/chat/completions"
+API_KEY = "sk-your-api-key"
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "model": "dolphin3",
+    "messages": [
+        {"role": "user", "content": "Write a poem"}
+    ],
+    "stream": True
+}
+
+response = requests.post(API_URL, headers=headers, json=data, stream=True)
+
+for line in response.iter_lines():
+    if line:
+        print(line.decode('utf-8'))
+```
+
+**Using OpenAI Library:**
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-your-api-key",
+    base_url="https://api.yourdomain.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="dolphin3",
+    messages=[
+        {"role": "user", "content": "Hello!"}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+### JavaScript/Node.js
+
+**Basic Usage:**
+```javascript
+const API_URL = "https://api.yourdomain.com/v1/chat/completions";
+const API_KEY = "sk-your-api-key";
+
+async function chat(message) {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'dolphin3',
+      messages: [
+        { role: 'user', content: message }
+      ]
+    })
+  });
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+chat("Explain blockchain").then(console.log);
+```
+
+**Streaming Response:**
+```javascript
+async function chatStream(message) {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'dolphin3',
+      messages: [{ role: 'user', content: message }],
+      stream: true
+    })
+  });
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    
+    const chunk = decoder.decode(value);
+    console.log(chunk);
+  }
+}
+```
+
+### PHP
+
+```php
+<?php
+$apiUrl = "https://api.yourdomain.com/v1/chat/completions";
+$apiKey = "sk-your-api-key";
+
+$data = [
+    "model" => "dolphin3",
+    "messages" => [
+        ["role" => "user", "content" => "Hello!"]
+    ]
+];
+
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Authorization: Bearer $apiKey",
+    "Content-Type: application/json"
+]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$result = json_decode($response, true);
+echo $result['choices'][0]['message']['content'];
+?>
+```
+
+### Telegram Bot (Python)
+
+```python
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+import requests
+
+API_URL = "https://api.yourdomain.com/v1/chat/completions"
+API_KEY = "sk-your-api-key"
+BOT_TOKEN = "your-telegram-bot-token"
+
+async def chat_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_message = update.message.text
+    
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "model": "dolphin3",
+        "messages": [
+            {"role": "user", "content": user_message}
+        ]
+    }
+    
+    response = requests.post(API_URL, headers=headers, json=data)
+    result = response.json()
+    
+    ai_response = result['choices'][0]['message']['content']
+    await update.message.reply_text(ai_response)
+
+app = ApplicationBuilder().token(BOT_TOKEN).build()
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat_handler))
+app.run_polling()
+```
+
+---
+
+## 🛡️ Security
+
+### Best Practices
+
+1. **Keep API Keys Secret:** Never commit keys to version control
+2. **Use HTTPS:** Always use secure connections
+3. **Rotate Keys:** Periodically generate new API keys
+4. **Monitor Usage:** Check `/admin/stats` regularly
+5. **Rate Limiting:** Respect rate limits to avoid throttling
+
+### Error Codes
+
+| Code | Status | Description |
+|------|--------|-------------|
+| 200 | OK | Request successful |
+| 400 | Bad Request | Invalid request format |
+| 401 | Unauthorized | Invalid or missing API key |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Server Error | Server error |
+| 503 | Service Unavailable | Ollama not responding |
+
+---
+
+## 🔧 Troubleshooting
+
+### 401 Unauthorized
+- Verify API key is correct
+- Check `Authorization` header format: `Bearer sk-your-key`
+- Ensure key hasn't been revoked
+
+### 429 Rate Limit
+- Reduce request frequency
+- Contact admin to increase limits
+- Implement exponential backoff
+
+### Slow Responses
+- Try different models (smaller = faster)
+- Reduce `max_tokens`
+- Lower `temperature` for faster sampling
+
+### Model Not Available
+- Check `/v1/models` for available models
+- Contact admin to request model installation
+
+### Connection Timeout
+- Check internet connection
+- Verify API endpoint URL
+- Try increasing request timeout
+
+---
+
+## 📚 Model Comparison
+
+| Model | Size | Speed | Quality | Best For |
+|-------|------|-------|---------|----------|
+| dolphin3 | 7B | ⚡⚡⚡ | ⭐⭐⭐ | General chat, fast responses |
+| mistral-uncensored | 7B | ⚡⚡ | ⭐⭐⭐⭐ | Balanced performance |
+| llama3-lexi | 8B | ⚡⚡ | ⭐⭐⭐⭐ | Creative writing, storytelling |
+| nous-hermes2 | 13B | ⚡ | ⭐⭐⭐⭐⭐ | Complex reasoning, analysis |
+
+---
+
+## 💡 Tips & Tricks
+
+### Optimize Token Usage
+- Use concise system prompts
+- Clear chat history when switching topics
+- Set appropriate `max_tokens` limits
+
+### Improve Response Quality
+- Use clear, specific prompts
+- Adjust `temperature` (lower = focused, higher = creative)
+- Provide examples in system message
+- Use role-based prompts
+
+### Handle Streaming
+- Process chunks incrementally
+- Implement timeout handling
+- Buffer for smooth display
+
+---
+
+## ⚖️ Disclaimer
+
+This API has no built-in content filtering. Users are responsible for:
+- Ensuring compliance with applicable laws
+- Using the service ethically and responsibly
+- Understanding generated content limitations
+- Not using for illegal purposes
+
+**Use at your own risk.**
+
+---
+
+## 📞 Support
+
+For support:
+- Check interactive docs: `/docs`
+- Review error messages carefully
+- Contact your API administrator
+- Check admin panel for system status
+
+---
+
+**Built for developers who need freedom and flexibility in AI integration.**
