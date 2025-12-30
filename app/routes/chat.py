@@ -14,23 +14,22 @@ Private Use Only – Team Autixs Members Exclusive.
 """
 from fastapi import APIRouter, Depends
 import requests
-from proxies import get_httpx_client
-from security.auth import verify_auth
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+from ..config import OLLAMA_HOST, DEFAULT_MODEL
+from ..auth import verify_api_key
 
 router = APIRouter()
 
-@router.post("/chat/completions")
-async def chat_completions(body: dict, auth = Depends(verify_auth)):
-    body["model"] = body.get("model", os.getenv("DEFAULT_MODEL"))
+@router.post("/v1/chat/completions")
+async def chat_completions(body: dict, key: str = Depends(verify_api_key)):
+    if "model" not in body:
+        body["model"] = DEFAULT_MODEL
     
-    # Outgoing Ollama call (local hai to direct, future mein remote bhi)
     response = requests.post(f"{OLLAMA_HOST}/v1/chat/completions", json=body, stream=body.get("stream", False))
-    
     if body.get("stream", False):
         return response.iter_content(chunk_size=1024)
+    return response.json()
+
+@router.get("/v1/models")
+async def list_models(key: str = Depends(verify_api_key)):
+    response = requests.get(f"{OLLAMA_HOST}/v1/models")
     return response.json()

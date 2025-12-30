@@ -2,6 +2,7 @@
 # Copyright © 2025 Team Autixs. All Rights Reserved.
 # Private Use Only – Unauthorized distribution prohibited.
 # Team Autixs Exclusive Property.
+#!/bin/bash
 echo "Installing Ollama..."
 curl -fsSL https://ollama.com/install.sh | sh
 
